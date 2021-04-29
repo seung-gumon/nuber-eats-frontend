@@ -1,15 +1,63 @@
 import React from 'react';
+import {useForm} from "react-hook-form";
+
+
+interface ILoginForm {
+    email?: string;
+    password: string;
+}
 
 
 export const Login = () => {
+
+    const {register, getValues, errors, handleSubmit} = useForm<ILoginForm>();
+
+    const onSubmit = () => {
+        console.log(getValues());
+    }
+
     return (
         <div className='h-screen flex items-center justify-center bg-gray-800'>
-            <div className='bg-white w-full max-w-lg py-10 rounded-lg text-center'>
+            <div className='bg-white w-full max-w-lg pt-10 pb-5 py-10 rounded-lg text-center'>
                 <h3 className='text-3xl text-gray-800'>Log In</h3>
-                <form className='flex flex-col mt-5 px-5'>
-                    <input placeholder={'Email'} className='bg-gray-100 shadow-inner mb-3 py-3 px-5 rounded-lg focus:outline-none border-2 focus:border-green-600 focus:border-opacity-50'/>
-                    <input placeholder={'Password'} className='bg-gray-100 shadow-inner py-3 px-5 rounded-lg focus:outline-none border-2 focus:border-green-600 focus:border-opacity-50'/>
-                    <button className={'py-3 px-5 bg-gray-800 text-white mt-5 rounded-lg text-lg focus:outline-none hover:opacity-90'}>Log In</button>
+                <form onSubmit={handleSubmit(onSubmit)} className='grid gap-3 mt-5 px-5 '>
+                    <input
+                        ref={register({
+                            required: "이메일은 필수 사항 입니다."
+                        })}
+                        type={'email'}
+                        placeholder={'Email'}
+                        name={'email'}
+                        required
+                        className='input'
+                    />
+                    {errors.email?.message && (
+                        <span className='text-medium text-red-500'>{errors.email?.message}</span>
+                    )}
+                    <input
+                        ref={register({
+                            required: "비밀번호는 필수 사항 입니다.",
+                            minLength: 10
+                        })}
+                        type={'password'}
+                        placeholder={'Password'}
+                        name={'password'}
+                        required
+                        className='input'
+                    />
+                    {errors.password?.message && (
+                        <span className='text-medium text-red-500'>
+                            {errors.password?.message}
+                        </span>
+                    )}
+                    {errors.password?.type === "minLength" && (
+                        <span className='text-medium text-red-500'>
+                            비밀번호는 최소 10글자 적어주세요
+                        </span>
+                    )}
+                    <button
+                        className={'mt-5 btn'}>Log In
+                    </button>
                 </form>
             </div>
         </div>
