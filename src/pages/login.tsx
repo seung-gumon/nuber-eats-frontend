@@ -14,14 +14,11 @@ interface ILoginForm {
 }
 
 const LOGIN_MUTATION = gql`
-    mutation loginMutation($email:String! , $password : String!){
-        login(input : {
-            email : $email,
-            password : $password
-        }) {
+    mutation loginMutation($loginInput: LoginInput!) {
+        login(input: $loginInput) {
             ok
-            error
             token
+            error
         }
     }
 `;
@@ -31,18 +28,37 @@ export const Login = () => {
 
     const {register, getValues, errors, handleSubmit} = useForm<ILoginForm>();
 
+    const onCompleted = (data: loginMutation) => {
+        const {
+            login: {ok, token},
+        } = data;
+        if (ok) {
+            console.log(token);
+        }
+    }
 
-    const [loginMutation] = useMutation<loginMutation, loginMutationVariables>(LOGIN_MUTATION);
+
+    const [loginMutation, {
+        data: loginMutationResult,
+        loading: loginLoading
+    }] = useMutation<loginMutation, loginMutationVariables>(LOGIN_MUTATION, {
+        onCompleted,
+    });
 
 
-    const onSubmit = () => {
-        const {email, password} = getValues();
-        loginMutation({
-            variables: {
-                email,
-                password,
-            }
-        })
+    const onSubmit = async () => {
+        if (!loginLoading) {
+            const {email, password} = getValues();
+            await loginMutation({
+                variables: {
+                    loginInput: {
+                        email,
+                        password,
+                    }
+                }
+            })
+        }
+
     }
 
     return (
@@ -80,7 +96,8 @@ export const Login = () => {
                     {errors.password?.type === "minLength" && (
                         <FormError errorMessage={'비밀번호는 최소 10글자 적어주세요'}/>
                     )}
-                    <button className={'mt-5 btn'}>Log In</button>
+                    <button className={'mt-5 btn'} onClick={onSubmit}>{loginLoading ? "Loading..." : "Log In"}</button>
+                    {loginMutationResult?.login.error && <FormError errorMessage={loginMutationResult.login.error}/>}
                 </form>
             </div>
         </div>
