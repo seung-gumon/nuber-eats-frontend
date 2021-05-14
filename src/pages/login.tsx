@@ -1,4 +1,5 @@
 import React from 'react';
+import Helmet from 'react-helmet';
 import {useForm} from "react-hook-form";
 import {FormError} from "../components/form-error";
 import {gql, useMutation} from "@apollo/client";
@@ -9,6 +10,7 @@ import {
 } from "../__generated__/loginMutation";
 import {Button} from "../components/button";
 import {Link} from 'react-router-dom'
+import {isLoggedInVar} from "../apollo";
 
 
 interface ILoginForm {
@@ -37,6 +39,7 @@ export const Login = () => {
         } = data;
         if (ok) {
             console.log(token);
+            isLoggedInVar(true);
         }
     }
 
@@ -47,6 +50,7 @@ export const Login = () => {
     }] = useMutation<loginMutation, loginMutationVariables>(LOGIN_MUTATION, {
         onCompleted,
     });
+
 
 
     const onSubmit = async () => {
@@ -65,13 +69,17 @@ export const Login = () => {
 
     return (
         <div className='h-screen flex items-center flex-col mt-10 lg:mt-28'>
+            <Helmet>
+                <title>Login | Nuber Eats</title>
+            </Helmet>
             <div className={'w-full max-w-screen-sm flex flex-col px-5 items-center'}>
                 <img src={nuberLogo} alt={"Logo"} className='w-52 mb-5'/>
                 <h4 className="w-full font-medium text-left text-3xl mb-7">Welcome Back</h4>
                 <form onSubmit={handleSubmit(onSubmit)} className='grid gap-3 w-full mb-3'>
                     <input
                         ref={register({
-                            required: "이메일은 필수 사항 입니다."
+                            required: "이메일은 필수 사항 입니다.",
+                            pattern : /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
                         })}
                         type={'email'}
                         placeholder={'Email'}
@@ -81,6 +89,9 @@ export const Login = () => {
                     />
                     {errors.email?.message && (
                         <FormError errorMessage={errors.email?.message}/>
+                    )}
+                    {errors.email?.type === 'pattern' && (
+                        <FormError errorMessage={"Please enter a valid email"}/>
                     )}
                     <input
                         ref={register({
