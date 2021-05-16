@@ -1,5 +1,5 @@
 import React from 'react';
-import Helmet from 'react-helmet';
+import {Helmet} from 'react-helmet-async';
 import {useForm} from "react-hook-form";
 import {FormError} from "../components/form-error";
 import {gql, useMutation} from "@apollo/client";
@@ -10,7 +10,8 @@ import {
 } from "../__generated__/loginMutation";
 import {Button} from "../components/button";
 import {Link} from 'react-router-dom'
-import {isLoggedInVar} from "../apollo";
+import {authTokenVar, isLoggedInVar} from "../apollo";
+import {LOCALSTORAGE_TOKEN} from "../constants";
 
 
 interface ILoginForm {
@@ -37,8 +38,9 @@ export const Login = () => {
         const {
             login: {ok, token},
         } = data;
-        if (ok) {
-            console.log(token);
+        if (ok && token) {
+            localStorage.setItem(LOCALSTORAGE_TOKEN, token);
+            authTokenVar(token);
             isLoggedInVar(true);
         }
     }
@@ -50,7 +52,6 @@ export const Login = () => {
     }] = useMutation<loginMutation, loginMutationVariables>(LOGIN_MUTATION, {
         onCompleted,
     });
-
 
 
     const onSubmit = async () => {
@@ -79,7 +80,7 @@ export const Login = () => {
                     <input
                         ref={register({
                             required: "이메일은 필수 사항 입니다.",
-                            pattern : /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                            pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
                         })}
                         type={'email'}
                         placeholder={'Email'}

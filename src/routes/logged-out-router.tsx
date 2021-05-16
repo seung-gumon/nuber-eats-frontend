@@ -1,8 +1,8 @@
 import React from "react";
-import {useForm} from "react-hook-form";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {Login} from "../pages/login";
 import {CreateAccount} from "../pages/create-account";
+import {NotFound} from "../pages/404";
 
 
 export const LoggedOutRouter = () => {
@@ -12,8 +12,11 @@ export const LoggedOutRouter = () => {
                 <Route path="/create-account">
                     <CreateAccount/>
                 </Route>
-                <Route path="/">
+                <Route path="/" exact={true}>
                     <Login/>
+                </Route>
+                <Route>
+                    <NotFound/>
                 </Route>
             </Switch>
         </Route>

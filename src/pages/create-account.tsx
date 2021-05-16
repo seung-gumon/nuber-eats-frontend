@@ -1,5 +1,5 @@
 import React from 'react';
-import Helmet from 'react-helmet';
+import {Helmet} from 'react-helmet-async';
 import {useForm} from "react-hook-form";
 import {FormError} from "../components/form-error";
 import {gql, useMutation} from "@apollo/client";
@@ -42,7 +42,8 @@ export const CreateAccount = () => {
     const onCompleted = (data: createAccountMutation) => {
         const {createAccount: {ok, error}} = data;
         if (ok) {
-            return history.push("/login");
+            alert("계정이 성공적으로 생성 되었습니다.");
+            return history.push("/");
         }
     }
     const [createAccountMutation, {
@@ -121,7 +122,7 @@ export const CreateAccount = () => {
                 </form>
                 <div>
                     Already have an account ?
-                    <Link to={'/login'} className={'text-lime-600 hover:underline'}> Log in now</Link>
+                    <Link to={'/'} className={'text-lime-600 hover:underline'}> Log in now</Link>
                 </div>
             </div>
         </div>
