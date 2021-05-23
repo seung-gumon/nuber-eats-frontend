@@ -1,10 +1,20 @@
 import React from 'react';
 import {useMe} from "../hooks/useMe";
 import {Button} from "../components/button";
+import {gql, useApolloClient, useMutation} from "@apollo/client";
 
 export const EditProfile = () => {
 
     const {data: userData} = useMe();
+
+    const EDIT_PROFILE_MUTATION = gql`
+        mutation editProfile($input : EditProfileInput!) {
+            editProfile(input : $input) {
+                ok
+                error
+            }
+        }
+    `
 
     return (
         <div className="mt-52 flex flex-col justify-center items-center">
