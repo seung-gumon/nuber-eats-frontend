@@ -3,7 +3,17 @@ import {useMe} from "../hooks/useMe";
 import {Button} from "../components/button";
 import {gql, useApolloClient, useMutation} from "@apollo/client";
 
+
+
+interface IEditProfile {
+    email : string
+    password : string
+}
+
+
 export const EditProfile = () => {
+
+
 
     const {data: userData} = useMe();
 
