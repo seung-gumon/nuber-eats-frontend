@@ -26,11 +26,27 @@ export const EditProfile = () => {
 
 
     const {data: userData} = useMe();
-
+    const client = useApolloClient();
     const onCompleted = (data: editProfile) => {
         const {editProfile: {error, ok}} = data;
-        if (ok) {
-            //update the Cache
+        if (ok && userData) {
+            const {me: {email: prevEmail, id}} = userData;
+            const {email: newEmail} = getValues();
+            if (prevEmail !== newEmail) {
+                client.writeFragment({
+                    id: `User:${id}`,
+                    fragment: gql`
+                        fragment EditedUser on User {
+                            verified
+                            email
+                        }
+                    `,
+                    data: {
+                        email: newEmail,
+                        verified: false,
+                    },
+                });
+            }
         }
     }
 
@@ -46,9 +62,9 @@ export const EditProfile = () => {
         }
     });
 
-    const onSubmit = () => {
+    const onSubmit = async () => {
         const {email, password} = getValues();
-        editProfile({
+        await editProfile({
             variables: {
                 input: {
                     email,
