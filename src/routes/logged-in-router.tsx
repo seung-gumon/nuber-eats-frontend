@@ -11,6 +11,7 @@ import {useMe} from "../hooks/useMe";
 import {NotFound} from "../pages/404";
 import {ConfirmEmail} from "../user/confirm-email";
 import {EditProfile} from "../user/edit-profile";
+import {AllCategories} from "../pages/client/all-categories";
 
 const ClientRoutes = [
     <Route path="/" key={1} exact>
@@ -21,6 +22,9 @@ const ClientRoutes = [
     </Route>,
     <Route path="/edit-profile" key={3} exact>
         <EditProfile/>
+    </Route>,
+    <Route path="/all-categories" key={4} exact>
+        <AllCategories/>
     </Route>,
 ];
 

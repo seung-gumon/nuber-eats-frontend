@@ -6,6 +6,27 @@
     @apply focus:outline-none focus:border-gray-500 p-3 border-2 text-lg font-light font-medium border-gray-200 transition-colors;
 }
 
+.categoryBackground {
+    background-color: #f6f0ea;
+}
+
+
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+
+
 
 
 @tailwind utilities;
