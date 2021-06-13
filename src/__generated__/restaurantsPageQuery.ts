@@ -14,7 +14,7 @@ export interface restaurantsPageQuery_mainCategories_categories {
   id: number;
   name: string;
   coverImg: string | null;
-  slug: string;
+  slug: string | null;
   restaurantCount: number;
 }
 

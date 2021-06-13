@@ -12,7 +12,7 @@ export interface allCategoriesQuery_allCategories_categories {
   id: number;
   name: string;
   coverImg: string | null;
-  slug: string;
+  slug: string | null;
 }
 
 export interface allCategoriesQuery_allCategories {

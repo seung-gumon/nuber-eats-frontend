@@ -7,6 +7,8 @@ import {Link, useHistory} from 'react-router-dom'
 import {MainCategory} from "../../components/main-category";
 import {Restaurant} from "../../components/restaurant";
 import {useForm} from "react-hook-form";
+import {Helmet} from "react-helmet-async";
+import {RESTAURANT_FRAGMENT} from "../../fragments";
 
 
 const RESTAURANTS_QUERY = gql`
@@ -28,17 +30,11 @@ const RESTAURANTS_QUERY = gql`
             totalPages
             totalResults
             results {
-                id
-                name
-                coverImg
-                category {
-                    name
-                }
-                address
-                isPromoted
+                ...RestaurantParts
             }
         }
     }
+    ${RESTAURANT_FRAGMENT}
 `;
 
 interface IFormProps {
@@ -71,14 +67,17 @@ export const Restaurants = () => {
         const {searchTerm} = getValues();
 
         return history.push({
-            pathname : "/search",
-            search : searchTerm
+            pathname: "/search",
+            search: `?term=${searchTerm}`
         })
     }
 
 
     return (
         <div>
+            <Helmet>
+                <title>Home | Nuber Eats</title>
+            </Helmet>
             <form onSubmit={handleSubmit(onSearchSubmit)} className={'bg-gray-800 w-full py-40 flex items-center justify-center'}>
                 <input
                     name={'searchTerm'}
