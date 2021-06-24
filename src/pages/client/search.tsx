@@ -7,6 +7,7 @@ import {
     searchRestaurant,
     searchRestaurantVariables,
 } from "../../__generated__/searchRestaurant";
+import {Restaurant} from "../../components/restaurant";
 
 const SEARCH_RESTAURANT = gql`
     query searchRestaurant($input: SearchRestaurantInput!) {
@@ -26,28 +27,49 @@ const SEARCH_RESTAURANT = gql`
 export const Search = () => {
     const location = useLocation();
     const history = useHistory();
-    const [callQuery, {loading, data, called}] = useLazyQuery<searchRestaurant,
+    const [callQuery, {data}] = useLazyQuery<searchRestaurant,
         searchRestaurantVariables>(SEARCH_RESTAURANT);
     useEffect(() => {
-        const [_, query] = location.search.split("?term=");
-        if (!query) {
+        const [_, queryString] = location.search.split("?term=");
+        const [query, page] = queryString.split("?page=");
+        if (!queryString || isNaN(Number(page))) {
             return history.replace("/");
         }
+
+
         callQuery({
             variables: {
                 input: {
-                    page: 1,
-                    query,
+                    page: Number(page),
+                    query: decodeURI(query)
                 },
             },
         });
     }, [history, location]);
+
+
     return (
         <div>
             <Helmet>
                 <title>Search | Nuber Eats</title>
             </Helmet>
-            <h1>Search page</h1>
+            <div className={'max-w-screen-xl mx-auto mt-8'}>
+                <div className={'grid md:grid-cols-3 grid-rows-1 gap-x-5 gap-y-10'}>
+                    {
+                        data?.searchRestaurant?.restaurants?.map((restaurant) => {
+                            return (
+                                <Restaurant
+                                    key={restaurant.id}
+                                    id={restaurant.id + ""}
+                                    coverImg={restaurant.coverImg}
+                                    name={restaurant.name}
+                                    categoryName={restaurant.category?.name}
+                                />
+                            )
+                        })
+                    }
+                </div>
+            </div>
         </div>
     );
 };
