@@ -13,6 +13,7 @@ import {ConfirmEmail} from "../user/confirm-email";
 import {EditProfile} from "../user/edit-profile";
 import {AllCategories} from "../pages/client/all-categories";
 import {Search} from "../pages/client/search";
+import {Category} from "../pages/client/category";
 
 const ClientRoutes = [
     <Route path="/" key={1} exact>
@@ -27,8 +28,11 @@ const ClientRoutes = [
     <Route path="/all-categories" key={4} exact>
         <AllCategories/>
     </Route>,
-    <Route path="/search" key={4} exact>
+    <Route path="/search" key={5} exact>
         <Search/>
+    </Route>,
+    <Route path="/category/:slug" key={6} exact>
+        <Category/>
     </Route>,
 ];
 

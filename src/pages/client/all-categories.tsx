@@ -30,7 +30,7 @@ export const AllCategories = () => {
             <ul className={'grid grid-cols-3 grid-rows-3 gap-2 mt-10'}>
                 {data?.allCategories.categories?.map((category) => {
                     return (
-                        <Link to={`category/${category.id}`}>
+                        <Link to={`category/${category.slug}`}>
                             <span className={'text-lg font-medium hover:underline'}>{category.name}</span>
                         </Link>
                     )

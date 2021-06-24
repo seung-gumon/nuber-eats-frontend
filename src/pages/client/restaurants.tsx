@@ -8,7 +8,7 @@ import {MainCategory} from "../../components/main-category";
 import {Restaurant} from "../../components/restaurant";
 import {useForm} from "react-hook-form";
 import {Helmet} from "react-helmet-async";
-import {RESTAURANT_FRAGMENT} from "../../fragments";
+import {CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT} from "../../fragments";
 
 
 const RESTAURANTS_QUERY = gql`
@@ -17,11 +17,7 @@ const RESTAURANTS_QUERY = gql`
             ok
             error
             categories {
-                id
-                name
-                coverImg
-                slug
-                restaurantCount
+                ...CategoryParts
             }
         }
         restaurants(input: $input) {
@@ -35,10 +31,11 @@ const RESTAURANTS_QUERY = gql`
         }
     }
     ${RESTAURANT_FRAGMENT}
+    ${CATEGORY_FRAGMENT}
 `;
 
 interface IFormProps {
-    searchTerm : string;
+    searchTerm: string;
 }
 
 
@@ -59,7 +56,7 @@ export const Restaurants = () => {
     const onPrevPageClick = () => setPage(currentPage => currentPage - 1);
 
 
-    const {register , handleSubmit , getValues} = useForm();
+    const {register, handleSubmit, getValues} = useForm();
 
     const history = useHistory();
 
@@ -78,10 +75,11 @@ export const Restaurants = () => {
             <Helmet>
                 <title>Home | Nuber Eats</title>
             </Helmet>
-            <form onSubmit={handleSubmit(onSearchSubmit)} className={'bg-gray-800 w-full py-40 flex items-center justify-center'}>
+            <form onSubmit={handleSubmit(onSearchSubmit)}
+                  className={'bg-gray-800 w-full py-40 flex items-center justify-center'}>
                 <input
                     name={'searchTerm'}
-                    ref={register({required: true , min : 3})}
+                    ref={register({required: true, min: 3})}
                     className={'input rounded-md border-0 md:w-3/12 w-3/4'}
                     type={'Search'}
                     placeholder={'음식점 이름으로 찾기'}/>
