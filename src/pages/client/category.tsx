@@ -3,6 +3,7 @@ import {useLocation , useParams} from "react-router-dom";
 import {gql, useQuery} from "@apollo/client";
 import {CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT} from "../../fragments";
 import {category, categoryVariables} from "../../__generated__/category";
+import {Helmet} from "react-helmet-async";
 
 const CATEGORY_QUERY = gql`
     query category($input: CategoryInput!) {
@@ -43,5 +44,13 @@ export const Category = () => {
 
     console.log(data);
 
-    return <h1>Category</h1>
+    return (
+        <div>
+            <Helmet>
+                <title>{data?.category.category?.name ? `${data?.category.category?.name} | Category` : "Category"}</title>
+            </Helmet>
+            <span>Category</span>
+        </div>
+
+    )
 }
