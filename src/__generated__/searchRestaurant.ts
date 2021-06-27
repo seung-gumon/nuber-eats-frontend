@@ -11,6 +11,7 @@ import { SearchRestaurantInput } from "./globalTypes";
 
 export interface searchRestaurant_searchRestaurant_restaurants_category {
   __typename: "Category";
+  id: number;
   name: string;
 }
 

@@ -12,7 +12,6 @@ const ALL_CATEGORIES = gql`
             categories {
                 id
                 name
-                coverImg
                 slug
             }
         }

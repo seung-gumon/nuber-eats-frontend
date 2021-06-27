@@ -1,7 +1,6 @@
 import React from "react";
 import {
     BrowserRouter as Router,
-    Redirect,
     Route,
     Switch,
 } from "react-router-dom";
@@ -14,6 +13,7 @@ import {EditProfile} from "../user/edit-profile";
 import {AllCategories} from "../pages/client/all-categories";
 import {Search} from "../pages/client/search";
 import {Category} from "../pages/client/category";
+import {Restaurant} from "../pages/client/restaurant";
 
 const ClientRoutes = [
     <Route path="/" key={1} exact>
@@ -33,6 +33,9 @@ const ClientRoutes = [
     </Route>,
     <Route path="/category/:slug" key={6} exact>
         <Category/>
+    </Route>,
+    <Route path="/restaurant/:id" key={7} exact>
+        <Restaurant/>
     </Route>,
 ];
 

@@ -11,7 +11,6 @@ export interface allCategoriesQuery_allCategories_categories {
   __typename: "Category";
   id: number;
   name: string;
-  coverImg: string | null;
   slug: string | null;
 }
 

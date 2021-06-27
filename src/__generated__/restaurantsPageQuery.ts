@@ -27,6 +27,7 @@ export interface restaurantsPageQuery_mainCategories {
 
 export interface restaurantsPageQuery_restaurants_results_category {
   __typename: "Category";
+  id: number;
   name: string;
 }
 

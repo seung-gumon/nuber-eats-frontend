@@ -9,6 +9,7 @@
 
 export interface RestaurantParts_category {
   __typename: "Category";
+  id: number;
   name: string;
 }
 
