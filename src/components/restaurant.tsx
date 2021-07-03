@@ -10,10 +10,12 @@ interface IRestaurant {
 
 
 export const Restaurant: React.FC<IRestaurant> = ({coverImg, name, categoryName, id}) => {
+    console.log(coverImg)
+
     return (
         <Link to={`/restaurant/${id}`}>
             <div className={'py-1'}>
-                <div style={{backgroundImage: `url(${coverImg})`}} className="bg-red-500 bg-cover bg-center mb-3 py-28">
+                <div style={{backgroundImage: `url(${coverImg})`}} className="bg-cover bg-center mb-3 py-28">
                 </div>
                 <h3 className="text-xl font-medium px-1 md:px-0">{name}</h3>
                 <span
