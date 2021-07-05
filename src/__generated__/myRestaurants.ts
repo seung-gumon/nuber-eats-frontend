@@ -7,29 +7,29 @@
 // GraphQL query operation: myRestaurants
 // ====================================================
 
-export interface myRestaurants_myRestaurant_restaurants_category {
+export interface myRestaurants_myRestaurants_restaurants_category {
   __typename: "Category";
   id: number;
   name: string;
 }
 
-export interface myRestaurants_myRestaurant_restaurants {
+export interface myRestaurants_myRestaurants_restaurants {
   __typename: "Restaurant";
   id: number;
   name: string;
   coverImg: string;
-  category: myRestaurants_myRestaurant_restaurants_category | null;
+  category: myRestaurants_myRestaurants_restaurants_category | null;
   address: string;
   isPromoted: boolean;
 }
 
-export interface myRestaurants_myRestaurant {
-  __typename: "MyRestaurantOutput";
+export interface myRestaurants_myRestaurants {
+  __typename: "MyRestaurantsOutput";
   ok: boolean;
   error: string | null;
-  restaurants: myRestaurants_myRestaurant_restaurants[] | null;
+  restaurants: myRestaurants_myRestaurants_restaurants[] | null;
 }
 
 export interface myRestaurants {
-  myRestaurant: myRestaurants_myRestaurant;
+  myRestaurants: myRestaurants_myRestaurants;
 }

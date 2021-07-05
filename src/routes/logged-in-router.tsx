@@ -14,8 +14,10 @@ import {AllCategories} from "../pages/client/all-categories";
 import {Search} from "../pages/client/search";
 import {Category} from "../pages/client/category";
 import {Restaurant} from "../pages/client/restaurant";
-import {MyRestaurant} from "../pages/owner/my-restaurant";
+import {MyRestaurants} from "../pages/owner/my-restaurants";
 import {AddRestaurant} from "../pages/owner/add-restaurant";
+import {MyRestaurant} from "../pages/owner/my-restaurant";
+import {AddDish} from "../pages/owner/add-dish";
 
 
 const clientRoutes = [
@@ -51,12 +53,20 @@ const commonRoutes = [
 const RestaurantRoutes = [
     {
         path: "/",
-        component: <MyRestaurant/>
+        component: <MyRestaurants/>
     },
     {
         path: "/add-restaurant",
         component: <AddRestaurant/>
     },
+    {
+        path: "/restaurant/:id",
+        component: <MyRestaurant/>
+    },
+    {
+        path: "/restaurant/:restaurantId/add-dish",
+        component: <AddDish/>
+    }
 ];
 
 export const LoggedInRouter = () => {

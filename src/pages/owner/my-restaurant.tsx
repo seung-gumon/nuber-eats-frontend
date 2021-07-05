@@ -1,66 +1,74 @@
-import React, {useEffect} from 'react';
-import {gql, useApolloClient, useQuery} from "@apollo/client";
-import {RESTAURANT_FRAGMENT} from "../../fragments";
-import {myRestaurants} from "../../__generated__/myRestaurants";
+import React from 'react';
+import {gql, useQuery} from "@apollo/client";
+import {DISH_FRAGMENT, RESTAURANT_FRAGMENT} from "../../fragments";
+import {useParams} from "react-router-dom";
+import {myRestaurant, myRestaurantVariables} from "../../__generated__/myRestaurant";
 import {Helmet} from "react-helmet-async";
 import {Link} from 'react-router-dom';
-import {Restaurant} from "../../components/restaurant";
 
 
-export const MY_RESTAURANTS_QUERY = gql`
-    query myRestaurants {
-        myRestaurant {
+export const MY_RESTAURANT_QUERY = gql`
+    query myRestaurant($input: MyRestaurantInput!) {
+        myRestaurant(input: $input) {
             ok
             error
-            restaurants {
+            restaurant {
                 ...RestaurantParts
+                menu {
+                    ...DishParts
+                }
             }
         }
     }
     ${RESTAURANT_FRAGMENT}
-`
+    ${DISH_FRAGMENT}
+`;
+
+
+interface IProps {
+    id: string;
+}
+
 
 export const MyRestaurant = () => {
+    const {id} = useParams<IProps>();
 
 
-    const {data} = useQuery<myRestaurants>(MY_RESTAURANTS_QUERY);
+    const {data} = useQuery<myRestaurant, myRestaurantVariables>(MY_RESTAURANT_QUERY, {
+        variables: {
+            input: {
+                id: +id
+            }
+        }
+    })
+
 
     return (
         <div>
-            <Helmet>
-                <title>My Restaurants | Nuber Eats</title>
-            </Helmet>
-            <div className={'max-w-screen-2xl mx-auto mt-32'}>
-                <h2 className={'text-4xl font-medium mb-10'}>My Restaurants</h2>
-                {data?.myRestaurant.ok && data.myRestaurant.restaurants?.length === 0 ?
-                    (
-                        <>
-                            <h4>You have no Restaurants</h4>
-                            <Link className={'text-lime-600 hover:underline'} to={'/add-restaurant'}>
-                                Create One &rarr;
-                            </Link>
-                        </>
-                    ) :
-                    (
-                        <div className={'grid md:grid-cols-3 grid-rows-1 gap-x-5 gap-y-10'}>
-                            {
-                                data?.myRestaurant.restaurants?.map((restaurant) => {
-                                    return (
-                                        <Restaurant
-                                            key={restaurant.id}
-                                            id={restaurant.id + ""}
-                                            coverImg={restaurant.coverImg}
-                                            name={restaurant.name}
-                                            categoryName={restaurant.category?.name}
-                                        />
-                                    )
-                                })
-                            }
-                        </div>
-                    )
-                }
+            <div
+                className="  bg-gray-700  py-28 bg-center bg-cover"
+                style={{
+                    backgroundImage: `url(${data?.myRestaurant.restaurant?.coverImg})`,
+                }}
+            ></div>
+            <div className="container mt-10 px-10">
+                <h2 className="text-4xl font-medium mb-10">
+                    {data?.myRestaurant.restaurant?.name || "Loading..."}
+                </h2>
+                <Link to={`/restaurant/${id}/add-dish`} className=" mr-8 text-white bg-gray-800 py-3 px-10">
+                    Add Dish &rarr;
+                </Link>
+                <Link to={``} className=" text-white bg-lime-700 py-3 px-10">
+                    Buy Promotion &rarr;
+                </Link>
+                <div className="mt-10">
+                    {data?.myRestaurant.restaurant?.menu.length === 0 ? (
+                        <h4 className="text-xl mb-5">Please upload a dish!</h4>
+                    ) : null}
+                </div>
             </div>
-
         </div>
+
     )
+
 }

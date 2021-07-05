@@ -7,7 +7,7 @@ import {useForm} from "react-hook-form";
 import {Button} from "../../components/button";
 import {Helmet} from "react-helmet-async";
 import {FormError} from "../../components/form-error";
-import {MY_RESTAURANTS_QUERY} from "./my-restaurant";
+import {MY_RESTAURANTS_QUERY} from "./my-restaurants";
 import {useHistory} from "react-router-dom";
 
 
