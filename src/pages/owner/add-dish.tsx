@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useParams , useHistory} from "react-router-dom";
 import {gql, useMutation} from "@apollo/client";
 import {createDish, createDishVariables} from "../../__generated__/createDish";
@@ -31,11 +31,11 @@ interface IForm {
 
 export const AddDish = () => {
 
-    const history =  useHistory();
+    const history = useHistory();
     const {restaurantId} = useParams<IParams>()
-    const {register, getValues, errors, handleSubmit, formState} = useForm<IForm>({mode: "onChange"});
-    const [createDishMutation , {loading}] = useMutation<createDish , createDishVariables>(CREATE_DISH_MUTATION , {
-        onCompleted : () => {
+    const {register, getValues, errors, handleSubmit, formState , setValue} = useForm<IForm>({mode: "onChange"});
+    const [createDishMutation, {loading}] = useMutation<createDish, createDishVariables>(CREATE_DISH_MUTATION, {
+        onCompleted: () => {
             alert("메뉴가 생성 되었습니다.");
             return history.goBack();
         },
@@ -50,7 +50,7 @@ export const AddDish = () => {
 
 
     const onSubmit = async () => {
-        const {name, price, description} = getValues();
+        const {name, price, description , ...rest} = getValues();
 
         await createDishMutation({
             variables: {
@@ -63,6 +63,24 @@ export const AddDish = () => {
             }
         });
     }
+
+
+    const [optionsNumber , setOptionsNumber] = useState(0);
+
+
+    const onAddOptionClick = () => {
+        setOptionsNumber((current) => current + 1)
+    }
+
+    const onDeleteClick = (idToDelete : number) => {
+        setOptionsNumber((current) => current-1);
+        // @ts-ignore
+        setValue(`${idToDelete}-optionName`, "")
+        // @ts-ignore
+        setValue(`${idToDelete}-optionExtra`, "")
+    }
+
+
 
     return (
         <div className="container flex flex-col items-center mt-52">
@@ -91,6 +109,25 @@ export const AddDish = () => {
                     placeholder="Price"
                     ref={register({ required: "Price is required." })}
                 />
+                <div className={'my-10'}>
+                    <h4 className={'font-medium mb-3 text-lg'}>Dish Option</h4>
+                    <span
+                        onClick={onAddOptionClick}
+                        className={'cursor-pointer text-white bg-gray-900 py-1 px-2 mt-5'}
+                    >
+                        Add Dish Option
+                    </span>
+                    {optionsNumber !== 0 && (
+                        Array.from(new Array(optionsNumber)).map((_,index) => (
+                            <div key={index} className={'mt-5'}>
+                                <input ref={register} name={`${index}OptionName`} className={'py-2 px-4 mr-3 focus:outline-none focus:border-gray-800 border-2'} type={'text'} placeholder={'Option Name'}/>
+                                <input ref={register} name={`${index}OptionExtra`} className={'py-2 px-4 focus:outline-none focus:border-gray-800 border-2'} type={'number'} min={0} placeholder={'Option Extra'}/>
+                                <span onClick={() => onDeleteClick(index)}>Delete Option</span>
+                            </div>
+                        ))
+                    )
+                    }
+                </div>
                 <input
                     className="input"
                     type="text"
