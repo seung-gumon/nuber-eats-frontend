@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useParams , useHistory} from "react-router-dom";
 import {gql, useMutation} from "@apollo/client";
 import {createDish, createDishVariables} from "../../__generated__/createDish";
@@ -26,14 +26,28 @@ interface IForm {
     name : string;
     price : string;
     description : string
+    [Key:string] : string;
 }
 
 
 export const AddDish = () => {
 
+
+    const [uploading, setUploading] = useState<boolean>(false);
+    const [imageUrl, setImageUrl] = useState<string>("");
+
     const history = useHistory();
     const {restaurantId} = useParams<IParams>()
-    const {register, getValues, errors, handleSubmit, formState , setValue} = useForm<IForm>({mode: "onChange"});
+    const {watch,register, getValues, errors, handleSubmit, formState, setValue} = useForm<IForm>(
+        {mode: "onChange"}
+    );
+
+
+    useEffect(() => {
+        console.log(formState.isValid)
+    },[formState.isValid])
+
+
     const [createDishMutation, {loading}] = useMutation<createDish, createDishVariables>(CREATE_DISH_MUTATION, {
         onCompleted: () => {
             alert("메뉴가 생성 되었습니다.");
@@ -49,34 +63,72 @@ export const AddDish = () => {
     })
 
 
-    const onSubmit = async () => {
-        const {name, price, description , ...rest} = getValues();
+    const uploadDishImage = async () => {
 
-        await createDishMutation({
-            variables: {
-                input: {
-                    restaurantId: +restaurantId,
-                    name,
-                    price : +price,
-                    description
-                }
-            }
-        });
+        try{
+            setUploading(true);
+            const {file} = getValues();
+
+            const dishFile = file[0];
+            const formBody = new FormData();
+
+
+            formBody.append('file', dishFile)
+            const {url: dishImage} = await (await fetch("http://localhost:4000/uploads/", {
+                method: "POST",
+                body: formBody
+            })).json();
+
+            setImageUrl(() => dishImage);
+            setUploading(false);
+
+        }catch{
+            return alert('새로고침후 다시 올려주세요.');
+        }
     }
 
 
-    const [optionsNumber , setOptionsNumber] = useState(0);
+    const onSubmit = async () => {
+
+        try{
+
+            const {file, name, price, description, ...rest} = getValues();
+            const optionObject = optionsNumber.map(theId => ({
+                name: rest[`${theId}-optionName`],
+                extra: +rest[`${theId}-optionExtra`]
+            }));
+
+
+            await createDishMutation({
+                variables: {
+                    input: {
+                        name,
+                        price: +price,
+                        description,
+                        restaurantId: +restaurantId,
+                        options: optionObject,
+                        photo : imageUrl
+                    }
+                }
+            });
+        }catch (e) {
+
+        }
+
+    }
+
+
+    const [optionsNumber , setOptionsNumber] = useState<number[]>([]);
 
 
     const onAddOptionClick = () => {
-        setOptionsNumber((current) => current + 1)
+        setOptionsNumber((current) => [Date.now() , ...current]);
     }
 
     const onDeleteClick = (idToDelete : number) => {
-        setOptionsNumber((current) => current-1);
-        // @ts-ignore
+        setOptionsNumber((current) => current.filter((id) => id !== idToDelete));
+
         setValue(`${idToDelete}-optionName`, "")
-        // @ts-ignore
         setValue(`${idToDelete}-optionExtra`, "")
     }
 
@@ -94,6 +146,27 @@ export const AddDish = () => {
                 onSubmit={handleSubmit(onSubmit)}
                 className="grid max-w-screen-sm gap-3 mt-5 w-full mb-5"
             >
+                <h4 className={'font-medium text-lg'}>Upload Dish Images</h4>
+                {
+                    uploading ?
+                        <span className={'font-bold'}>Loading...</span>
+                        :
+                        <input className={'my-3 mb-0'}
+                               type={'file'}
+                               name={'file'}
+                               accept={'image'}
+                               onChange={() => uploadDishImage()}
+                               ref={register()}
+                        />
+                }
+
+                {!imageUrl ?
+                    <span>Please Upload Dish Image</span>
+                :
+                    <div className={'my-3'} style={{'width':'300px'}}>
+                        <img src={imageUrl} alt={'DishImage'}/>
+                    </div>
+                }
                 <input
                     className="input"
                     type="text"
@@ -117,12 +190,16 @@ export const AddDish = () => {
                     >
                         Add Dish Option
                     </span>
-                    {optionsNumber !== 0 && (
-                        Array.from(new Array(optionsNumber)).map((_,index) => (
-                            <div key={index} className={'mt-5'}>
-                                <input ref={register} name={`${index}OptionName`} className={'py-2 px-4 mr-3 focus:outline-none focus:border-gray-800 border-2'} type={'text'} placeholder={'Option Name'}/>
-                                <input ref={register} name={`${index}OptionExtra`} className={'py-2 px-4 focus:outline-none focus:border-gray-800 border-2'} type={'number'} min={0} placeholder={'Option Extra'}/>
-                                <span onClick={() => onDeleteClick(index)}>Delete Option</span>
+                    {optionsNumber.length !== 0 && (
+                        optionsNumber.map((id) => (
+                            <div key={id} className={'mt-5'}>
+                                <input ref={register} name={`${id}-optionName`}
+                                       className={'py-2 px-4 mr-3 focus:outline-none focus:border-gray-800 border-2'}
+                                       type={'text'} placeholder={'Option Name'}/>
+                                <input ref={register} name={`${id}-optionExtra`}
+                                       className={'py-2 px-4 focus:outline-none focus:border-gray-800 border-2'}
+                                       type={'number'} min={0} placeholder={'Option Extra'}/>
+                                <span className={'cursor-pointer py-2 text-white bg-red-500 py-1 px-2 mt-5 ml-3'} onClick={() => onDeleteClick(id)}>Delete Option</span>
                             </div>
                         ))
                     )
@@ -137,7 +214,7 @@ export const AddDish = () => {
                 />
                 <Button
                     loading={loading}
-                    canClick={formState.isValid}
+                    canClick={formState.isValid && Boolean(imageUrl)}
                     actionText="Create Dish"
                 />
             </form>

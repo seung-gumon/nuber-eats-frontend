@@ -10,7 +10,6 @@ interface IRestaurant {
 
 
 export const Restaurant: React.FC<IRestaurant> = ({coverImg, name, categoryName, id}) => {
-    console.log(coverImg)
 
     return (
         <Link to={`/restaurant/${id}`}>
