@@ -43,10 +43,6 @@ export const AddDish = () => {
     );
 
 
-    useEffect(() => {
-        console.log(formState.isValid)
-    },[formState.isValid])
-
 
     const [createDishMutation, {loading}] = useMutation<createDish, createDishVariables>(CREATE_DISH_MUTATION, {
         onCompleted: () => {
