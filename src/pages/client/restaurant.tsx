@@ -6,6 +6,7 @@ import {restaurant, restaurantVariables} from "../../__generated__/restaurant";
 import {Helmet} from "react-helmet-async";
 import {Dish} from "../../components/dish";
 import {CreateOrderItemInput} from "../../__generated__/globalTypes";
+import {DishOption} from "../../components/dish-option";
 
 
 const RESTAURANT = gql`
@@ -19,7 +20,7 @@ const RESTAURANT = gql`
                     ...DishParts
                 }
             }
-            
+
         }
     }
     ${RESTAURANT_FRAGMENT}
@@ -46,23 +47,28 @@ export const Restaurant = () => {
 
     const {id} = useParams<IParams>();
 
-    const [orderStart , setOrderStart] = useState(false);
-    const [orderItems , setOrderItems] = useState<CreateOrderItemInput[]>([]);
+    const [orderStart, setOrderStart] = useState(false);
+    const [orderItems, setOrderItems] = useState<CreateOrderItemInput[]>([]);
 
 
-    const addItemToOrder = (dishId : number) => {
+
+    const addItemToOrder = (dishId: number) => {
         if (!isSelected(dishId)) {
-            setOrderItems((current) => [{dishId},...current])
+            setOrderItems((current) => [{dishId, options: []}, ...current])
         }
     }
 
-    const removeFromOrder= (dishId : number) => {
+    const removeFromOrder = (dishId: number) => {
         setOrderItems((current) => current.filter(dish => dish.dishId !== dishId));
     }
 
 
-    const isSelected = (dishId : number) => {
-        return Boolean(orderItems.find(order => order.dishId === dishId))
+    const getItem = (dishId: number) => {
+        return orderItems.find(order => order.dishId === dishId)
+    }
+
+    const isSelected = (dishId: number) => {
+        return Boolean(getItem(dishId))
     }
 
     const {data} = useQuery<restaurant, restaurantVariables>(RESTAURANT, {
@@ -78,11 +84,64 @@ export const Restaurant = () => {
     }
 
 
+    const addOptionToItem = (dishId: number, optionName: string) => {
+        if (!isSelected(dishId)) {
+            return
+        }
+        const oldItem = getItem(dishId);
+        if (oldItem) {
+            const hasOption = Boolean(oldItem.options?.find(aOption => aOption.name === optionName))
+            if (!hasOption) {
+                removeFromOrder(dishId);
+                return setOrderItems((current) => [{
+                    dishId,
+                    options: [{name: optionName}, ...oldItem.options!]
+                }, ...current])
+            }
+        }
+    }
 
+    const getOptionFromItem = (item: CreateOrderItemInput, optionName: string) => {
+        return item.options?.find(option => option.name === optionName)
+    }
+
+    const isOptionSelected = (dishId: number, optionName: string) => {
+        const item = getItem(dishId);
+        if (item) {
+            return Boolean(getOptionFromItem(item, optionName));
+        }
+        return false;
+    }
+
+    const removeOptionFromItem = (dishId: number, optionName: string) => {
+        if (!isSelected(dishId)) {
+            return;
+        }
+        const oldItem = getItem(dishId);
+        if (oldItem) {
+            removeFromOrder(dishId);
+            setOrderItems((current) => [
+                {
+                    dishId,
+                    options: oldItem.options?.filter(
+                        (option) => option.name !== optionName
+                    ),
+                },
+                ...current,
+            ]);
+            return;
+        }
+    };
+
+
+    useEffect(() => {
+        console.log(orderItems, "Order Items")
+    }, [orderItems])
 
     return (
         <div>
-            <div className={'bg-gray-800 bg-center bg-cover py-48'} style={{'backgroundImage': `url(${data?.restaurant.restaurant?.coverImg})`}}>
+            <div className={'bg-gray-800 bg-center bg-cover py-48'}
+                 style={{'backgroundImage': `url(${data?.restaurant.restaurant?.coverImg})`}}>
                 <Helmet>
                     <title>{data?.restaurant.restaurant?.name ? `${data.restaurant.restaurant.name} | Nuber-Eats` : "Restaurant"}</title>
                 </Helmet>
@@ -95,7 +154,8 @@ export const Restaurant = () => {
                 </div>
             </div>
             <div className={'px-10 mt-10'}>
-                <button onClick={() => triggerStartOrder()} className={`text-lg font-medium text-white py-4 focus:outline:none transition-colors bg-lime-600 hover:bg-lime-700 px-10`}>
+                <button onClick={() => triggerStartOrder()}
+                        className={`text-lg font-medium text-white py-4 focus:outline:none transition-colors bg-lime-600 hover:bg-lime-700 px-10`}>
                     {orderStart ? "Ordering" : "Start Order"}
                 </button>
             </div>
@@ -116,7 +176,22 @@ export const Restaurant = () => {
                         options={dish.options}
                         addItemToOrder={addItemToOrder}
                         removeFromOrder={removeFromOrder}
-                    />
+                    >
+                        {
+                            dish.options?.map((option, index) => (
+                                <DishOption
+                                    key={index}
+                                    dishId={dish.id}
+                                    isSelected={isOptionSelected(dish.id, option.name)}
+                                    name={option.name}
+                                    extra={option.extra}
+                                    addOptionToItem={addOptionToItem}
+                                    removeOptionFromItem={removeOptionFromItem}
+                                />
+
+                            ))
+                        }
+                    </Dish>
                 ))
                 }
             </div>
