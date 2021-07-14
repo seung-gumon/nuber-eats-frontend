@@ -54,14 +54,18 @@ export const Dish: React.FC<IDishProps> =
             <div
                 className={`px-8 py-4 border hover:border-gray-800 transition-all flex items-center ${isSelected ? "border-gray-800" : "cursor-pointer hover:border-gray-800"}`}>
 
-                <div className={'flex flex-col  flex-1'}>
-                    <h3 className={'font-medium text-xl'}>{name} {orderStarted &&
-                    <button onClick={() => onClick()}>{isSelected ? "Remove" : "Add"}</button>}</h3>
+                <div className={'flex flex-col flex-1 justify-center'}>
+                    <h3 className={'font-medium text-xl flex items-center'}>{name}
+                    {orderStarted &&
+                        <button className={`ml-1 ${isSelected ? "bg-red-500" : "bg-lime-500"} text-sm px-3 text-white`} onClick={() => onClick()}>{isSelected ? "Remove" : "Add"}</button>
+                    }</h3>
                     <h4 className={'font-base text-sm'}>{description}</h4>
                     <span className={'mt-6'}>가격 : {addComma(price)}원</span>
+
+
                     {isCustomer && options && options?.length !== 0 && (
-                        <div className={'overflow-y-hidden'} style={{'maxHeight': '130px'}}>
-                            <h5 className={'my-2 font-medium'}>Dish Options</h5>
+                        <div className={'overflow-y-auto'} style={{'maxHeight': '130px'}}>
+                            <h5 className={'my-2 font-medium mt-3'}>Dish Options</h5>
                             {dishOptions}
                         </div>
                     )}

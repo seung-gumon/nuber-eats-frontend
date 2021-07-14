@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {useParams, Link} from "react-router-dom";
-import {gql, useQuery} from "@apollo/client";
+import {useParams, Link, useHistory} from "react-router-dom";
+import {gql, useMutation, useQuery} from "@apollo/client";
 import {DISH_FRAGMENT, RESTAURANT_FRAGMENT} from "../../fragments";
 import {restaurant, restaurantVariables} from "../../__generated__/restaurant";
 import {Helmet} from "react-helmet-async";
 import {Dish} from "../../components/dish";
 import {CreateOrderItemInput} from "../../__generated__/globalTypes";
 import {DishOption} from "../../components/dish-option";
+import {createOrder, createOrderVariables} from "../../__generated__/createOrder";
 
 
 const RESTAURANT = gql`
@@ -33,6 +34,7 @@ const CREATE_ORDER_MUTATION = gql`
         createOrder(input : $input) {
             ok
             error
+            orderId
         }
     }
 `
@@ -133,6 +135,47 @@ export const Restaurant = () => {
         }
     };
 
+    const history = useHistory();
+    const onCompleted = (data: createOrder) => {
+        const {createOrder: {ok, orderId}} = data;
+        if (ok) {
+            alert('주문이 완료 되었습니다');
+            return history.push(`/orders/${orderId}`)
+        }
+    }
+
+    const [createOrderMutation , {loading : placeLoading}] = useMutation<createOrder , createOrderVariables>(CREATE_ORDER_MUTATION, {
+        onCompleted
+    })
+
+
+    const triggerCancelOrder = () => {
+        setOrderStart(false);
+        setOrderItems([]);
+    }
+
+
+    const triggerConfirmOrder = async () => {
+        if (orderItems.length === 0) {
+            return alert("메뉴를 먼저 선택해주세요!")
+        }
+
+        const ok = window.confirm('주문 하시겠습니까 ?');
+
+        if (ok) {
+            await createOrderMutation({
+                variables: {
+                    input: {
+                        restaurantId: +id,
+                        items: orderItems
+                    }
+                }
+            })
+        }
+    }
+
+
+
 
     useEffect(() => {
         console.log(orderItems, "Order Items")
@@ -154,10 +197,24 @@ export const Restaurant = () => {
                 </div>
             </div>
             <div className={'px-10 mt-10'}>
-                <button onClick={() => triggerStartOrder()}
-                        className={`text-lg font-medium text-white py-4 focus:outline:none transition-colors bg-lime-600 hover:bg-lime-700 px-10`}>
-                    {orderStart ? "Ordering" : "Start Order"}
-                </button>
+                {!orderStart &&
+                    <button onClick={() => triggerStartOrder()}
+                            className={`text-lg font-medium text-white py-4 focus:outline:none transition-colors bg-lime-600 hover:bg-lime-700 px-10`}>
+                        Start Order
+                    </button>
+                }
+                {orderStart &&
+                    <>
+                        <button onClick={triggerConfirmOrder} className={'text-lg font-medium text-white py-4 focus:outline:none transition-colors bg-lime-600 hover:bg-lime-700 px-10'}>
+                            Confirm Order
+                        </button>
+                        <button onClick={triggerCancelOrder}
+                                className={'text-lg font-medium text-white py-4 ml-3 focus:outline:none transition-colors bg-black px-10'}>
+                            Cancel Order
+                        </button>
+                    </>
+                }
+
             </div>
 
 
@@ -188,7 +245,6 @@ export const Restaurant = () => {
                                     addOptionToItem={addOptionToItem}
                                     removeOptionFromItem={removeOptionFromItem}
                                 />
-
                             ))
                         }
                     </Dish>
