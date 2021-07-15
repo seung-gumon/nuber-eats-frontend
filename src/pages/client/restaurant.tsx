@@ -138,7 +138,7 @@ export const Restaurant = () => {
     const history = useHistory();
     const onCompleted = (data: createOrder) => {
         const {createOrder: {ok, orderId}} = data;
-        if (ok) {
+        if (ok && !placeLoading) {
             alert('주문이 완료 되었습니다');
             return history.push(`/orders/${orderId}`)
         }
