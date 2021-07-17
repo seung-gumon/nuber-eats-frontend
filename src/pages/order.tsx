@@ -6,7 +6,6 @@ import {getOrder, getOrderVariables} from "../__generated__/getOrder";
 import {Helmet} from "react-helmet-async";
 import {FULL_ORDER_FRAGMENT} from "../fragments";
 import {orderUpdates, orderUpdatesVariables} from "../__generated__/orderUpdates";
-// import {orderUpdates, orderUpdatesVariables} from "../__generated__/orderUpdates";
 
 
 const GET_ORDER = gql`
@@ -50,7 +49,7 @@ export const Order: React.FC<IOrder> = () => {
     }
 
     const params = useParams<IParams>();
-    const {data} = useQuery<getOrder, getOrderVariables>(GET_ORDER, {
+    const {data , subscribeToMore} = useQuery<getOrder, getOrderVariables>(GET_ORDER, {
         variables: {
             input: {
                 id: +params.id
@@ -58,16 +57,36 @@ export const Order: React.FC<IOrder> = () => {
         }
     });
 
-
-    const {data: subscriptionData, loading} = useSubscription<orderUpdates, orderUpdatesVariables>(ORDER_SUBSCRIPTION, {
-        variables: {
-            input: {
-                id: +params.id
-            }
+    useEffect(() => {
+        if (data?.getOrder.ok) {
+            subscribeToMore({
+                document : ORDER_SUBSCRIPTION,
+                variables : {
+                    input: {
+                        id: +params.id
+                    },
+                },
+                updateQuery : (
+                    prev,
+                    {
+                        subscriptionData : {data},
+                    } : {subscriptionData : {data : orderUpdates}}
+                ) => {
+                    if (!data) return prev;
+                    return {
+                        getOrder : {
+                            ...prev.getOrder,
+                            order : {
+                                ...data.orderUpdates,
+                            }
+                        }
+                    }
+                },
+            })
         }
-    });
+    },[data])
 
-    console.log(subscriptionData)
+
 
     return (
         <div className={'p-2 w-full h-screen flex flex-col justify-center items-center'}
