@@ -1,12 +1,14 @@
 import React, {useEffect} from 'react';
 import {useParams} from "react-router-dom";
 import {gql} from "@apollo/client/core";
-import {useQuery, useSubscription} from "@apollo/client";
+import {useMutation, useQuery} from "@apollo/client";
 import {getOrder, getOrderVariables} from "../__generated__/getOrder";
 import {Helmet} from "react-helmet-async";
 import {FULL_ORDER_FRAGMENT} from "../fragments";
-import {orderUpdates, orderUpdatesVariables} from "../__generated__/orderUpdates";
+import {orderUpdates} from "../__generated__/orderUpdates";
 import {useMe} from "../hooks/useMe";
+import {editOrder, editOrderVariables} from "../__generated__/editOrder";
+import {OrderStatus, UserRole} from "../__generated__/globalTypes";
 
 
 const GET_ORDER = gql`
@@ -32,9 +34,14 @@ const ORDER_SUBSCRIPTION = gql`
 `;
 
 
-interface IOrder {
-
-}
+const EDIT_ORDER = gql`
+    mutation editOrder($input : EditOrderInput!) {
+        editOrder(input : $input) {
+            ok
+            error
+        }
+    }
+`
 
 
 interface IParams {
@@ -42,7 +49,7 @@ interface IParams {
 }
 
 
-export const Order: React.FC<IOrder> = () => {
+export const Order = () => {
 
 
     const addComma = (price: any) => {
@@ -51,10 +58,11 @@ export const Order: React.FC<IOrder> = () => {
 
     const params = useParams<IParams>();
     const {data : userData} = useMe();
+    const [editOrderMutation] = useMutation<editOrder, editOrderVariables>(EDIT_ORDER);
     const {data , subscribeToMore} = useQuery<getOrder, getOrderVariables>(GET_ORDER, {
         variables: {
             input: {
-                id: +params.id
+                id: +params.id,
             }
         }
     });
@@ -89,6 +97,17 @@ export const Order: React.FC<IOrder> = () => {
     },[data])
 
 
+    const onButtonClick = (newStatus: OrderStatus) => {
+        editOrderMutation({
+            variables: {
+                input: {
+                    id: +params.id,
+                    status: newStatus
+                }
+            }
+        })
+    }
+
 
     return (
         <div className={'p-2 w-full h-screen flex flex-col justify-center items-center'}
@@ -115,23 +134,29 @@ export const Order: React.FC<IOrder> = () => {
                     <span
                         className={'w-11/12 text-left border-b-2 border-gray-500 text-lg py-4'}>배달원 이메일: {data?.getOrder.order?.driver?.email ? data?.getOrder.order?.driver?.email : "배정 안됌"}</span>
                 </div>
-                {userData?.me.role === 'Client' &&
+                {userData?.me.role === UserRole.Client &&
                     <div className={'w-full flex flex-col justify-center items-center'} style={{'maxWidth': '600px'}}>
                         <span className={'w-11/12 text-lime-600 text-center text-lg py-4'}>Status : {data?.getOrder.order?.status}</span>
                     </div>
                 }
-                {userData?.me.role === "Owner" && (
+                {userData?.me.role === UserRole.Owner && (
                     <>
-                        {data?.getOrder.order?.status === "Pending" && (
+                        {data?.getOrder.order?.status === OrderStatus.Pending && (
                             <div className={'w-full flex flex-col justify-center items-center px-3'} style={{'maxWidth': '600px'}}>
-                                <button className={'w-full text-center my-3 text-white rounded-md hover:bg-lime-600 py-2 px-3 bg-lime-400'}>Accept Order</button>
+                                <button onClick={() => onButtonClick(OrderStatus.Cooking)} className={'w-full text-center my-3 text-white rounded-md hover:bg-lime-600 py-2 px-3 bg-lime-400'}>Accept Order</button>
                             </div>
                         )}
-                        {data?.getOrder.order?.status === "Cooking" && (
+                        {data?.getOrder.order?.status === OrderStatus.Cooking && (
                             <div className={'w-full flex flex-col justify-center items-center px-3'} style={{'maxWidth': '600px'}}>
-                                <button className={'w-full text-center my-3 text-white rounded-md hover:bg-lime-600 py-2 px-3 bg-lime-400'}>Order Cooked</button>
+                                <button onClick={() => onButtonClick(OrderStatus.Cooked)} className={'w-full text-center my-3 text-white rounded-md hover:bg-lime-600 py-2 px-3 bg-lime-400'}>Order Cooked</button>
                             </div>
                         )}
+                        {
+                            data?.getOrder.order?.status !== OrderStatus.Cooking && data?.getOrder.order?.status !== OrderStatus.Pending &&
+                            <div className={'w-full flex flex-col justify-center items-center'} style={{'maxWidth': '600px'}}>
+                                <span className={'w-11/12 text-lime-600 text-center text-lg py-4'}>Status : {data?.getOrder.order?.status}</span>
+                            </div>
+                        }
                     </>
                 )}
 
