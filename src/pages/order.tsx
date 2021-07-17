@@ -78,9 +78,7 @@ export const Order = () => {
                 },
                 updateQuery : (
                     prev,
-                    {
-                        subscriptionData : {data},
-                    } : {subscriptionData : {data : orderUpdates}}
+                    {subscriptionData : {data},} : {subscriptionData : {data : orderUpdates}}
                 ) => {
                     if (!data) return prev;
                     return {

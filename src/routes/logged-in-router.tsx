@@ -1,9 +1,5 @@
 import React from "react";
-import {
-    BrowserRouter as Router,
-    Route,
-    Switch,
-} from "react-router-dom";
+import {BrowserRouter as Router, Route, Switch,} from "react-router-dom";
 import {Restaurants} from "../pages/client/restaurants";
 import {Header} from "../components/header";
 import {useMe} from "../hooks/useMe";
@@ -19,6 +15,8 @@ import {AddRestaurant} from "../pages/owner/add-restaurant";
 import {MyRestaurant} from "../pages/owner/my-restaurant";
 import {AddDish} from "../pages/owner/add-dish";
 import {Order} from "../pages/order";
+import {Dashboard} from "../pages/driver/dashboard";
+import {UserRole} from "../__generated__/globalTypes";
 
 
 const clientRoutes = [
@@ -37,6 +35,14 @@ const clientRoutes = [
     }, {
         path: "/all-categories",
         component: <AllCategories/>
+    },
+]
+
+
+const driverRoutes = [
+    {
+        path: "/",
+        component: <Dashboard/>
     },
 ]
 
@@ -87,11 +93,15 @@ export const LoggedInRouter = () => {
         <Router>
             <Header/>
             <Switch>
-                {data.me.role === "Client" && clientRoutes.map(route =>
+                {data.me.role === UserRole.Client && clientRoutes.map(route =>
                     <Route exact key={route.path} path={route.path}>
                         {route.component}
                     </Route>)}
-                {data.me.role === "Owner" && RestaurantRoutes.map(route =>
+                {data.me.role === UserRole.Owner && RestaurantRoutes.map(route =>
+                    <Route exact key={route.path} path={route.path}>
+                        {route.component}
+                    </Route>)}
+                {data.me.role === UserRole.Delivery && driverRoutes.map(route =>
                     <Route exact key={route.path} path={route.path}>
                         {route.component}
                     </Route>)}
