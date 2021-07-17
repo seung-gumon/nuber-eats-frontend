@@ -4,45 +4,62 @@ import GoogleMapReact from 'google-map-react'
 
 interface ICoords {
     latitude: number;
-    longitude : number;
+    longitude: number;
 }
+
+interface IDriverProps extends ICoords {
+    $hover?: any;
+}
+
+
+const Driver: React.FC<IDriverProps> = ({latitude, longitude}) => <div
+    //@ts-ignore
+    lat={latitude}
+    //@ts-ignore
+    lng={longitude}
+    className={'text-lg'}>🏍</div>
 
 
 export const Dashboard = () => {
 
     const [driverCoords, setDriverCoords] = useState<ICoords>({longitude: 0, latitude: 0});
 
-    const [map,setMap] = useState<any>();
-    const [maps,setMaps] = useState<any>();
+    const [map, setMap] = useState<google.maps.Map>();
+    const [maps, setMaps] = useState<any>();
 
-    const onSuccess = ({coords : {longitude,latitude}}: GeolocationPosition) => {
-        setDriverCoords({longitude,latitude});
+
+    const onSuccess = ({coords: {longitude, latitude}}: GeolocationPosition) => {
+        setDriverCoords({longitude, latitude});
     }
 
     const onError = (error: GeolocationPositionError) => {
         console.log(error)
     }
 
-    const onApiLoaded = ({map, maps}: { map: any, maps: any }) => {
-        map.panTo(new maps.LatLng(driverCoords.latitude, driverCoords.longitude));
-        setMap(map)
+    useEffect(() => {
+        navigator.geolocation.watchPosition(onSuccess, onError, {
+            enableHighAccuracy: true,
+        })
+    }, [])
+
+    const onApiLoaded = ({map, maps}: { map: any; maps: any }) => {
+        map.panTo(new google.maps.LatLng(driverCoords.latitude, driverCoords.longitude));
+        setMap(map);
         setMaps(maps);
     };
 
 
     useEffect(() => {
         if (map && maps) {
-            map.panTo(new maps.LatLng(driverCoords.latitude, driverCoords.longitude));
+            map.panTo(new google.maps.LatLng(driverCoords.latitude, driverCoords.longitude));
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({location: new google.maps.LatLng(driverCoords.latitude, driverCoords.longitude)},
+                (results, status) => {
+                console.log(status, results)
+            })
         }
-    },[driverCoords.latitude , driverCoords.longitude])
+    }, [driverCoords.latitude, driverCoords.longitude])
 
-
-
-    useEffect(() => {
-        navigator.geolocation.watchPosition(onSuccess, onError, {
-            enableHighAccuracy: true,
-        })
-    }, [])
 
     return (
         <div>
@@ -57,12 +74,7 @@ export const Dashboard = () => {
                     yesIWantToUseGoogleMapApiInternals={true}
                     onGoogleApiLoaded={onApiLoaded}
                 >
-                    <div
-                        //@ts-ignore
-                        lat={driverCoords.latitude}
-                        //@ts-ignore
-                        lng={driverCoords.longitude}
-                        className={'text-lg'}>🏍</div>
+                    <Driver latitude={driverCoords.latitude} longitude={driverCoords.longitude}/>
                 </GoogleMapReact>
             </div>
         </div>
