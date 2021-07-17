@@ -107,6 +107,9 @@ export const Order = () => {
     }
 
 
+
+
+
     return (
         <div className={'p-2 w-full h-screen flex flex-col justify-center items-center'}
              style={{'paddingBottom': '55px'}}>
@@ -156,6 +159,31 @@ export const Order = () => {
                             </div>
                         }
                     </>
+                )}
+                {userData?.me.role === UserRole.Delivery && (
+                    <>
+                        {data?.getOrder.order?.status === OrderStatus.Cooked && (
+                            <button
+                                onClick={() => onButtonClick(OrderStatus.PickedUp)}
+                                className="w-11/12 text-center my-3 text-white rounded-md hover:bg-lime-600 py-2 px-3 bg-lime-400"
+                            >
+                                Picked Up
+                            </button>
+                        )}
+                        {data?.getOrder.order?.status === OrderStatus.PickedUp && (
+                            <button
+                                onClick={() => onButtonClick(OrderStatus.Delivered)}
+                                className="w-11/12 text-center my-3 text-white rounded-md hover:bg-lime-600 py-2 px-3 bg-lime-400"
+                            >
+                                Order Delivered
+                            </button>
+                        )}
+                    </>
+                )}
+                {data?.getOrder.order?.status === OrderStatus.Delivered && (
+                    <span className=" text-center mt-5 mb-3  text-2xl text-lime-600">
+              Thank you for using Nuber Eats
+            </span>
                 )}
 
             </div>
