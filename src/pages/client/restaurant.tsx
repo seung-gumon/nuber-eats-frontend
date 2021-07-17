@@ -138,8 +138,9 @@ export const Restaurant = () => {
     const history = useHistory();
     const onCompleted = (data: createOrder) => {
         const {createOrder: {ok, orderId}} = data;
-        if (ok && !placeLoading) {
-            alert('주문이 완료 되었습니다');
+
+        if (ok && placeLoading) {
+            alert('주문이 완료 되었습니다 주문내역 페이지로 이동합니다.');
             return history.push(`/orders/${orderId}`)
         }
     }
@@ -172,6 +173,8 @@ export const Restaurant = () => {
                 }
             })
         }
+
+
     }
 
 

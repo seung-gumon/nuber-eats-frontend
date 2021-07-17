@@ -6,6 +6,7 @@ import {getOrder, getOrderVariables} from "../__generated__/getOrder";
 import {Helmet} from "react-helmet-async";
 import {FULL_ORDER_FRAGMENT} from "../fragments";
 import {orderUpdates, orderUpdatesVariables} from "../__generated__/orderUpdates";
+import {useMe} from "../hooks/useMe";
 
 
 const GET_ORDER = gql`
@@ -49,6 +50,7 @@ export const Order: React.FC<IOrder> = () => {
     }
 
     const params = useParams<IParams>();
+    const {data : userData} = useMe();
     const {data , subscribeToMore} = useQuery<getOrder, getOrderVariables>(GET_ORDER, {
         variables: {
             input: {
@@ -113,10 +115,26 @@ export const Order: React.FC<IOrder> = () => {
                     <span
                         className={'w-11/12 text-left border-b-2 border-gray-500 text-lg py-4'}>배달원 이메일: {data?.getOrder.order?.driver?.email ? data?.getOrder.order?.driver?.email : "배정 안됌"}</span>
                 </div>
-                <div className={'w-full flex flex-col justify-center items-center'} style={{'maxWidth': '600px'}}>
-                    <span
-                        className={'w-11/12 text-lime-600 text-center text-lg py-4'}>Status : {data?.getOrder.order?.status}</span>
-                </div>
+                {userData?.me.role === 'Client' &&
+                    <div className={'w-full flex flex-col justify-center items-center'} style={{'maxWidth': '600px'}}>
+                        <span className={'w-11/12 text-lime-600 text-center text-lg py-4'}>Status : {data?.getOrder.order?.status}</span>
+                    </div>
+                }
+                {userData?.me.role === "Owner" && (
+                    <>
+                        {data?.getOrder.order?.status === "Pending" && (
+                            <div className={'w-full flex flex-col justify-center items-center px-3'} style={{'maxWidth': '600px'}}>
+                                <button className={'w-full text-center my-3 text-white rounded-md hover:bg-lime-600 py-2 px-3 bg-lime-400'}>Accept Order</button>
+                            </div>
+                        )}
+                        {data?.getOrder.order?.status === "Cooking" && (
+                            <div className={'w-full flex flex-col justify-center items-center px-3'} style={{'maxWidth': '600px'}}>
+                                <button className={'w-full text-center my-3 text-white rounded-md hover:bg-lime-600 py-2 px-3 bg-lime-400'}>Order Cooked</button>
+                            </div>
+                        )}
+                    </>
+                )}
+
             </div>
 
 
