@@ -38,7 +38,7 @@ https://sharp-dubinsky-7a4b59.netlify.app/
 ### 미리보기
 1. 주문 (subscription)
    ![order](https://user-images.githubusercontent.com/64651532/126050917-6b3179ae-527d-47cd-ac83-769bc6a562b8.gif)
-   (권한 : 식당 | 주문자 | 배달)
+   (권한 : 배달 | 식당 | 주문자)
 
 
 ### 공통
