@@ -70,7 +70,7 @@ export const AddDish = () => {
 
 
             formBody.append('file', dishFile)
-            const {url: dishImage} = await (await fetch("http://localhost:4000/uploads/", {
+            const {url: dishImage} = await (await fetch("https://reverent-wozniak-6334ad.netlify.app/uploads/", {
                 method: "POST",
                 body: formBody
             })).json();
