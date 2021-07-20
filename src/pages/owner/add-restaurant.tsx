@@ -101,7 +101,7 @@ export const AddRestaurant = () => {
             const actualFile = file[0];
             const formBody = new FormData();
             formBody.append('file', actualFile)
-            const {url: coverImg} = await (await fetch("https://reverent-wozniak-6334ad.netlify.app/", {
+            const {url: coverImg} = await (await fetch("https://reverent-wozniak-6334ad.netlify.app/uploads/", {
                 method: "POST",
                 body: formBody
             })).json();
