@@ -43,19 +43,19 @@ export const AddRestaurant = () => {
 
             const queryResult = client.readQuery({query: MY_RESTAURANTS_QUERY})
 
+            console.log(queryResult)
 
             await client.writeQuery({
                 query: MY_RESTAURANTS_QUERY,
                 data: {
-                    myRestaurant: {
-                        ...queryResult.myRestaurant,
+                    myRestaurants: {
+                        ...queryResult.myRestaurants,
                         restaurants: [
                             {
                                 address,
                                 category: {
-                                    name : categoryName,
-                                    __typename: 'Category',
-                                    __proto__: Object,
+                                    name: categoryName,
+                                    __typename: "Category",
                                 },
                                 coverImg: imageUrl,
                                 id: restaurantId,
@@ -63,10 +63,10 @@ export const AddRestaurant = () => {
                                 name,
                                 __typename: "Restaurant",
                             },
-                            ...queryResult.myRestaurant.restaurants
-                        ]
-                    }
-                }
+                            ...queryResult.myRestaurants.restaurants,
+                        ],
+                    },
+                },
             });
 
             setUploading(() => false);
