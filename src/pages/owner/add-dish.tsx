@@ -70,7 +70,7 @@ export const AddDish = () => {
 
 
             formBody.append('file', dishFile)
-            const {url: dishImage} = await (await fetch("https://reverent-wozniak-6334ad.netlify.app/uploads/", {
+            const {url: dishImage} = await (await fetch("https://nuber-eats-backend-seok.herokuapp.com/uploads/", {
                 method: "POST",
                 body: formBody
             })).json();
