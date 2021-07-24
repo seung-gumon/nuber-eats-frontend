@@ -10,7 +10,7 @@ Nomad Coder에서 수강한 Nuber Eats Clone Coding입니다 !<br />
 
 
 ## 🔗Front End 링크
-https://sharp-dubinsky-7a4b59.netlify.app/
+https://reverent-wozniak-6334ad.netlify.app/
 
 ## 💻Stack
 - [X] Typescript
@@ -37,8 +37,9 @@ https://sharp-dubinsky-7a4b59.netlify.app/
 
 ### 미리보기
 1. 주문 (subscription)
+   <br />
    ![order](https://user-images.githubusercontent.com/64651532/126050917-6b3179ae-527d-47cd-ac83-769bc6a562b8.gif)
-   (권한 : 배달 | 식당 | 주문자)
+   <br /> (권한 : 배달 | 식당 | 주문자)
 
 
 ### 공통
