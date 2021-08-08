@@ -75,7 +75,7 @@ export const CreateAccount = () => {
                 <title>Create Account | Nuber Eats</title>
             </Helmet>
             <div className={'w-full max-w-screen-sm flex flex-col px-5 items-center'}>
-                <img src={nuberLogo} alt={"Logo"} className='w-52 mb-5'/>
+                <img src={nuberLogo} alt={"Logo"} className="mb-10"/>
                 <h4 className="w-full font-medium text-left text-3xl mb-7">Let's get started</h4>
                 <form onSubmit={handleSubmit(onSubmit)} className='grid gap-3 w-full mb-3'>
                     <input
